@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Register | Sports Buddy</title>
+  <style>
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1592194996308-7b43878e84a6'); /* Replace this per page */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+    .container {
+      background: rgba(194, 218, 144, 0.95);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 350px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button.submit-btn {
+      padding: 10px 20px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button.submit-btn:hover {
+      background-color: #218838;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Register</h2>
+    <input type="email" id="regEmail" placeholder="User Email" required />
+    <input type="password" id="regPassword" placeholder="Password" required />
+    <button class="submit-btn" id="btnRegisterUser">Register as User</button>
+        <p>Already registered? <a href="user.html">Login</a></p>
+    <p>Want to register as Admin? <a href="admin-register.html">Register here</a></p>
+  </div>
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDl_PWiFJkSFT5-C4DvlwsxvMkbo8Pf6vY",
+      authDomain: "buddy-sports.firebaseapp.com",
+      projectId: "buddy-sports",
+      storageBucket: "buddy-sports.firebasestorage.app",
+      messagingSenderId: "877821058232",
+      appId: "1:877821058232:web:906c01636c12bda1fb284d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const adminEmails = ["admin@buddy.com", "admin@gmail.com", "youradminemail@example.com"];
+
+    document.getElementById("btnRegisterUser").addEventListener("click", async () => {
+      const email = regEmail.value.trim();
+      const password = regPassword.value.trim();
+
+      if (!email || !password) {
+        alert("❗ Please fill in all fields.");
+        return;
+      }
+
+      if (adminEmails.includes(email)) {
+        alert("❌ You cannot register as a user using an admin email.");
+        return;
+      }
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+       await setDoc(doc(db, "users", userCred.user.uid), { email, role: "user" });
+
+        alert("✅ User registered successfully!");
+        window.location.href = "user.html";
+
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

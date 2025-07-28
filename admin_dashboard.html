@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+  body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1592194996308-7b43878e84a6'); /* Replace this per page */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+  .container {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(171, 215, 74, 0.95);
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .section-title {
+    margin-top: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+</style>
+
+</head>
+<body >
+  <div class="container">
+    <h2>Admin Dashboard</h2>
+
+    <!-- Add Category -->
+    <div>
+      <p class="section-title">Manage Sports Category</p>
+      <input type="text" id="categoryName" placeholder="Enter Category Name" />
+      <button onclick="addCategory()">Add Category</button>
+      <button onclick="deleteCategory()">Delete Category</button>
+    </div>
+
+    <!-- Add/Update/Delete City -->
+    <div>
+      <p class="section-title">Manage City</p>
+      <input type="text" id="cityName" placeholder="Enter City Name" />
+      <button onclick="addOrUpdateCity()">Add/Update City</button>
+      <button onclick="deleteCity()">Delete City</button>
+    </div>
+
+    <!-- Add/Update/Delete Area -->
+    <div>
+      <p class="section-title">Manage Area</p>
+      <input type="text" id="areaName" placeholder="Enter Area Name" />
+      <button onclick="addOrUpdateArea()">Add/Update Area</button>
+      <button onclick="deleteArea()">Delete Area</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // ✅ Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDl_PWiFJkSFT5-C4DvlwsxvMkbo8Pf6vY",
+      authDomain: "buddy-sports.firebaseapp.com",
+      projectId: "buddy-sports",
+      storageBucket: "buddy-sports.firebasestorage.app",
+      messagingSenderId: "877821058232",
+      appId: "1:877821058232:web:906c01636c12bda1fb284d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // ✅ Sports Category Functions
+    window.addCategory = async function () {
+      const category = document.getElementById("categoryName").value.trim();
+      if (!category) return alert("Please enter a category name.");
+
+      try {
+        await setDoc(doc(db, "sportsCategories", category), {
+          name: category,
+          createdAt: new Date().toISOString()
+        });
+        alert("✅ Category added successfully!");
+        document.getElementById("categoryName").value = "";
+      } catch (error) {
+        alert("❌ Error adding category: " + error.message);
+      }
+    };
+
+    window.deleteCategory = async function () {
+      const category = document.getElementById("categoryName").value.trim();
+      if (!category) return alert("Please enter a category name to delete.");
+
+      try {
+        await deleteDoc(doc(db, "sportsCategories", category));
+        alert("🗑️ Category deleted successfully!");
+        document.getElementById("categoryName").value = "";
+      } catch (error) {
+        alert("❌ Error deleting category: " + error.message);
+      }
+    };
+
+    // ✅ City Functions
+    window.addOrUpdateCity = async function () {
+      const city = document.getElementById("cityName").value.trim();
+      if (!city) return alert("Please enter a city name.");
+
+      try {
+        await setDoc(doc(db, "cities", city), {
+          name: city,
+          updatedAt: new Date().toISOString()
+        });
+        alert("✅ City added/updated successfully!");
+        document.getElementById("cityName").value = "";
+      } catch (error) {
+        alert("❌ Error adding/updating city: " + error.message);
+      }
+    };
+
+    window.deleteCity = async function () {
+      const city = document.getElementById("cityName").value.trim();
+      if (!city) return alert("Please enter a city name to delete.");
+
+      try {
+        await deleteDoc(doc(db, "cities", city));
+        alert("🗑️ City deleted successfully!");
+        document.getElementById("cityName").value = "";
+      } catch (error) {
+        alert("❌ Error deleting city: " + error.message);
+      }
+    };
+
+    // ✅ Area Functions
+    window.addOrUpdateArea = async function () {
+      const area = document.getElementById("areaName").value.trim();
+      if (!area) return alert("Please enter an area name.");
+
+      try {
+        await setDoc(doc(db, "areas", area), {
+          name: area,
+          updatedAt: new Date().toISOString()
+        });
+        alert("✅ Area added/updated successfully!");
+        document.getElementById("areaName").value = "";
+      } catch (error) {
+        alert("❌ Error adding/updating area: " + error.message);
+      }
+    };
+
+    window.deleteArea = async function () {
+      const area = document.getElementById("areaName").value.trim();
+      if (!area) return alert("Please enter an area name to delete.");
+
+      try {
+        await deleteDoc(doc(db, "areas", area));
+        alert("🗑️ Area deleted successfully!");
+        document.getElementById("areaName").value = "";
+      } catch (error) {
+        alert("❌ Error deleting area: " + error.message);
+      }
+    };
+  </script>
+</body>
+</html>

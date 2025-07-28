@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Events | Sports Buddy</title>
+  <style>
+   body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1592194996308-7b43878e84a6'); /* Replace this per page */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+    .container {
+      background: rgba(177, 215, 105, 0.9);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    #eventsList {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .event-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .event-item span {
+      flex-grow: 1;
+    }
+
+    .event-item button {
+      background-color: #dc3545;
+      margin-left: 10px;
+    }
+
+    .event-item button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Your Sports Events</h2>
+    <div id="eventsList"></div>
+    <form id="frmEvent">
+      <input type="text" id="eventName" placeholder="Event Name" required>
+      <button type="submit">Add  Event</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDl_PWiFJkSFT5-C4DvlwsxvMkbo8Pf6vY",
+      authDomain: "buddy-sports.firebaseapp.com",
+      projectId: "buddy-sports",
+      storageBucket: "buddy-sports.appspot.com",
+      messagingSenderId: "877821058232",
+      appId: "1:877821058232:web:906c01636c12bda1fb284d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const eventForm = document.getElementById("frmEvent");
+    const eventInput = document.getElementById("eventName");
+    const eventsList = document.getElementById("eventsList");
+
+    // Load events on start
+    async function loadEvents() {
+      eventsList.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "userEvents"));
+      querySnapshot.forEach(docSnap => {
+        const event = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "event-item";
+        div.innerHTML = `
+          <span>${event.name}</span>
+          <button onclick="deleteEvent('${docSnap.id}')">Delete</button>
+        `;
+        eventsList.appendChild(div);
+      });
+    }
+
+    // Add or update event
+    eventForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const eventName = eventInput.value.trim();
+      if (!eventName) return alert("Please enter an event name.");
+
+      try {
+        await setDoc(doc(db, "userEvents", eventName), {
+          name: eventName,
+          timestamp: new Date().toISOString()
+        });
+        alert("✅ Event added/updated successfully!");
+        eventInput.value = "";
+        loadEvents();
+      } catch (err) {
+        console.error("Error:", err);
+        alert("❌ Failed to add event");
+      }
+    });
+
+    // Delete event
+    window.deleteEvent = async (eventId) => {
+      if (!confirm("Are you sure to delete this event?")) return;
+      try {
+        await deleteDoc(doc(db, "userEvents", eventId));
+        alert("🗑️ Event deleted!");
+        loadEvents();
+      } catch (err) {
+        console.error("Delete error:", err);
+        alert("❌ Failed to delete event");
+      }
+    };
+
+    loadEvents();
+  </script>
+</body>
+</html>

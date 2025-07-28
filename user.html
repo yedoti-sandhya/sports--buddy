@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Login | Sports Buddy</title>
+  <style>
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1592194996308-7b43878e84a6'); /* Replace this per page */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+    .container {
+      background: rgba(206, 233, 110, 0.95);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 350px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Login</h2>
+    <input type="email" id="userEmail" placeholder="Email" required />
+    <input type="password" id="userPassword" placeholder="Password" required />
+    <button id="btnUserLogin">Login</button>
+    <p>Don't have an account? <a href="user-register.html">Register</a></p>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+     const firebaseConfig = {
+    apiKey: "AIzaSyCeBmIf7vVHKPSYJYMhbQqe1Ypv1UDesww",
+    authDomain: "sports-buddy-3b422.firebaseapp.com",
+    projectId: "sports-buddy-3b422",
+    storageBucket: "sports-buddy-3b422.firebasestorage.app",
+    messagingSenderId: "340212403416",
+    appId: "1:340212403416:web:2b191c986e2488e5db5bad"
+  };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("btnUserLogin").addEventListener("click", async () => {
+      const email = document.getElementById("userEmail").value.trim();
+      const password = document.getElementById("userPassword").value.trim();
+
+      if (!email || !password) {
+        alert("❗ Please fill in all fields.");
+        return;
+      }
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCred.user;
+
+        // Check Firestore role
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const role = userSnap.data().role;
+          if (role === "user") {
+            alert("✅ Login successful!");
+            window.location.href = "events.html";
+          } else if (role === "admin") {
+            alert("❗ This is an admin account. Please login from the Admin Login page.");
+          } else {
+            alert("❌ Unknown role. Access denied.");
+          }
+        } else {
+          alert("❌ No user data found. Contact support.");
+        }
+
+      } catch (err) {
+        alert("❌ Login failed: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
