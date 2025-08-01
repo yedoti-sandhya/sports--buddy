@@ -77,14 +77,15 @@
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-     const firebaseConfig = {
-    apiKey: "AIzaSyCeBmIf7vVHKPSYJYMhbQqe1Ypv1UDesww",
-    authDomain: "sports-buddy-3b422.firebaseapp.com",
-    projectId: "sports-buddy-3b422",
-    storageBucket: "sports-buddy-3b422.firebasestorage.app",
-    messagingSenderId: "340212403416",
-    appId: "1:340212403416:web:2b191c986e2488e5db5bad"
-  };
+    const firebaseConfig = {
+  apiKey: "AIzaSyDl_PWiFJkSFT5-C4DvlwsxvMkbo8Pf6vY",
+  authDomain: "buddy-sports.firebaseapp.com",
+  projectId: "buddy-sports",
+  storageBucket: "buddy-sports.appspot.com", // FIXED bucket domain
+  messagingSenderId: "877821058232",
+  appId: "1:877821058232:web:906c01636c12bda1fb284d"
+};
+
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
